@@ -6,6 +6,7 @@ server:
   ReadTimeout: 5
   WriteTimeout: 5
   CtxDefaultTimeout: 12
+  SSL: false
 
 logger:
   Development: true

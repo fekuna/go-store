@@ -23,6 +23,7 @@ type ServerConfig struct {
 	ReadTimeout       time.Duration
 	WriteTimeout      time.Duration
 	CtxDefaultTimeout time.Duration
+	SSL               string
 }
 
 // Logger config

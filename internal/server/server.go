@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/fekuna/go-store/config"
+	"github.com/fekuna/go-store/pkg/logger"
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,15 +21,17 @@ const (
 
 // Server struct
 type Server struct {
-	echo *echo.Echo
-	cfg  *config.Config
+	echo   *echo.Echo
+	cfg    *config.Config
+	logger logger.Logger
 }
 
 // NewServer New Server constructor
-func NewServer(cfg *config.Config) *Server {
+func NewServer(cfg *config.Config, logger logger.Logger) *Server {
 	return &Server{
-		echo: echo.New(),
-		cfg:  cfg,
+		echo:   echo.New(),
+		cfg:    cfg,
+		logger: logger,
 	}
 }
 
@@ -41,9 +44,9 @@ func (s *Server) Run() error {
 	}
 
 	go func() {
-		log.Printf("Server is listening on PORT: %s", s.cfg.Server.Port)
+		s.logger.Infof("Server is listening on PORT: %s", s.cfg.Server.Port)
 		if err := s.echo.StartServer(server); err != nil {
-			log.Fatalln("Error starting Server: ", err)
+			s.logger.Fatalf("Error starting Server: ", err)
 		}
 	}()
 
