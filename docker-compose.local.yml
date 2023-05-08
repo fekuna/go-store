@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  postgresql:
+    image: postgres:12-alpine
+    container_name: pg-gostore
+    ports:
+      - "5432:5432"
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=go_store
+    volumes:
+      - ./.local/db/pgdata:/var/lib/postgresql/data
+    networks:
+      - web_api
+
+networks:
+  web_api:
+    driver: bridge
