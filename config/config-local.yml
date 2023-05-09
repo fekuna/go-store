@@ -19,7 +19,7 @@ logger:
 postgres:
   PostgresqlHost: localhost
   PostgresqlPort: 5432
-  PostgresqlUser: postgres
+  PostgresqlUsername: postgres
   PostgresqlPassword: postgres
   PostgresqlDbName: go_store
   PostgresqlSslMode: false

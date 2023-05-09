@@ -6,6 +6,8 @@ import (
 
 	"github.com/fekuna/go-store/config"
 	"github.com/jmoiron/sqlx"
+
+	_ "github.com/jackc/pgx/stdlib"
 )
 
 const (
