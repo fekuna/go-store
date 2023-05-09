@@ -24,6 +24,7 @@ type ServerConfig struct {
 	WriteTimeout      time.Duration
 	CtxDefaultTimeout time.Duration
 	SSL               string
+	Debug             bool
 }
 
 // Logger config
