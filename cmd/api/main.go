@@ -47,7 +47,7 @@ func main() {
 	}
 	defer psqlDB.Close()
 
-	s := server.NewServer(cfg, appLogger)
+	s := server.NewServer(cfg, appLogger, psqlDB)
 	if err = s.Run(); err != nil {
 		log.Fatal(err)
 	}

@@ -6,15 +6,21 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 
+	authHttp "github.com/fekuna/go-store/internal/auth/delivery/http"
+	authRepository "github.com/fekuna/go-store/internal/auth/repository"
+	authUC "github.com/fekuna/go-store/internal/auth/usecase"
 	apiMiddlewares "github.com/fekuna/go-store/pkg/middleware"
 )
 
 func (s *Server) MapHandlers(e *echo.Echo) error {
 	// Init Repository
+	authRepo := authRepository.NewAuthRepository(s.db)
 
 	// Init useCase
+	authUC := authUC.NewAuthUseCase(s.cfg, s.logger, authRepo)
 
 	// Init handlers
+	authHandlers := authHttp.NewAuthHandlers(s.cfg, s.logger, authUC)
 
 	mw := apiMiddlewares.NewMiddlewareManager(s.cfg, s.logger)
 
@@ -40,6 +46,12 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 	if s.cfg.Server.Debug {
 		e.Use(mw.DebugMiddleware)
 	}
+
+	v1 := e.Group("/api/v1")
+
+	authGroup := v1.Group("/auth")
+
+	authHttp.MapAuthRoutes(authGroup, authHandlers, mw)
 
 	return nil
 }

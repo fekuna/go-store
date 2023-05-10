@@ -11,6 +11,7 @@ import (
 
 	"github.com/fekuna/go-store/config"
 	"github.com/fekuna/go-store/pkg/logger"
+	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
 )
 
@@ -24,14 +25,16 @@ type Server struct {
 	echo   *echo.Echo
 	cfg    *config.Config
 	logger logger.Logger
+	db     *sqlx.DB
 }
 
 // NewServer New Server constructor
-func NewServer(cfg *config.Config, logger logger.Logger) *Server {
+func NewServer(cfg *config.Config, logger logger.Logger, db *sqlx.DB) *Server {
 	return &Server{
 		echo:   echo.New(),
 		cfg:    cfg,
 		logger: logger,
+		db:     db,
 	}
 }
 
@@ -45,10 +48,14 @@ func (s *Server) Run() error {
 
 	go func() {
 		s.logger.Infof("Server is listening on PORT: %s", s.cfg.Server.Port)
-		if err := s.echo.StartServer(server); err != nil {
+		if err := s.echo.StartServer(server); err != nil && err != http.ErrServerClosed {
 			s.logger.Fatalf("Error starting Server: ", err)
 		}
 	}()
+
+	if err := s.MapHandlers(s.echo); err != nil {
+		return err
+	}
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)

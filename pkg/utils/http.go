@@ -1,5 +1,10 @@
 package utils
 
+import (
+	"github.com/fekuna/go-store/pkg/logger"
+	"github.com/labstack/echo/v4"
+)
+
 // Get config path for local or docker
 func GetConfigPath(configPath string) string {
 	if configPath == "docker" {
@@ -7,4 +12,33 @@ func GetConfigPath(configPath string) string {
 	}
 
 	return "./config/config-local"
+}
+
+// Get request id from echo context
+func GetRequestID(c echo.Context) string {
+	return c.Response().Header().Get(echo.HeaderXRequestID)
+}
+
+// Get user ip address
+func GetIPAddress(c echo.Context) string {
+	return c.Request().RemoteAddr
+}
+
+// Read request body and validate
+func ReadRequest(ctx echo.Context, request interface{}) error {
+	if err := ctx.Bind(request); err != nil {
+		return err
+	}
+
+	return validate.StructCtx(ctx.Request().Context(), request)
+}
+
+// Error logging for echo context
+func LogResponseError(ctx echo.Context, logger logger.Logger, err error) {
+	logger.Errorf(
+		"LogResponseError, RequestID: %s, IPAddress: %s, Error: %s",
+		GetRequestID(ctx),
+		GetIPAddress(ctx),
+		err,
+	)
 }

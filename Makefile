@@ -16,7 +16,7 @@ migrate_up:
 	migrate -database postgres://postgres:postgres@localhost:5432/go_store?sslmode=disable -path migrations up 1
 
 migrate_down:
-	migrate -database postgres://postgres:postgres@localhost:5432/go_store/sslmode=disable -path migrations down 1
+	migrate -database postgres://postgres:postgres@localhost:5432/go_store?sslmode=disable -path migrations down 1
 
 # ==============================================================================
 # Docker compose command
