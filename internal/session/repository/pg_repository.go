@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
 
 	"github.com/fekuna/go-store/internal/models"
 	"github.com/fekuna/go-store/internal/session"
@@ -40,8 +38,6 @@ func (r *sessionRepo) UpdateSessionByUserId(ctx context.Context, sess *models.Se
 	// TODO: tracing
 
 	s := &models.Session{}
-	marshaled, _ := json.Marshal(sess)
-	fmt.Println(string(marshaled))
 	if err := r.db.QueryRowxContext(ctx, updateSession, &sess.UserID, &sess.RefreshToken, &sess.ExpiresAt).StructScan(s); err != nil {
 		return nil, errors.Wrap(err, "sessionRepo.UpdateSession.StructScan")
 	}
