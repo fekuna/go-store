@@ -5,6 +5,7 @@ import (
 
 	"github.com/fekuna/go-store/internal/auth"
 	"github.com/fekuna/go-store/internal/models"
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/pkg/errors"
 )
@@ -39,6 +40,15 @@ func (r *authRepo) FindByEmail(ctx context.Context, user *models.User) (*models.
 	foundUser := &models.User{}
 	if err := r.db.QueryRowxContext(ctx, findUserByEmail, user.Email).StructScan(foundUser); err != nil {
 		return nil, errors.Wrap(err, "authRepo.FindByEmail.QueryRowxContext")
+	}
+
+	return foundUser, nil
+}
+
+func (r *authRepo) GetByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	foundUser := &models.User{}
+	if err := r.db.QueryRowxContext(ctx, getUserById, userID).StructScan(foundUser); err != nil {
+		return nil, errors.Wrap(err, "authRepo.GetUserByID.QueryRowxContext")
 	}
 
 	return foundUser, nil

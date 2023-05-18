@@ -11,6 +11,7 @@ import (
 	"github.com/fekuna/go-store/pkg/httpErrors"
 	"github.com/fekuna/go-store/pkg/logger"
 	"github.com/fekuna/go-store/pkg/utils"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
@@ -103,4 +104,17 @@ func (u *authUC) Login(ctx context.Context, user *models.User) (*models.UserWith
 		User:  foundUser,
 		Token: authToken,
 	}, nil
+}
+
+func (u *authUC) GetByID(ctx context.Context, userID uuid.UUID) (*models.User, error) {
+	// TODO: tracing
+
+	user, err := u.authRepo.GetByID(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	user.SanitizePassword()
+
+	return user, nil
 }

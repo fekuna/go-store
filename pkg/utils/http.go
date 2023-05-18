@@ -5,6 +5,9 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// UserCtxKey is a key used for the User object in the context
+type UserCtxKey struct{}
+
 // Get config path for local or docker
 func GetConfigPath(configPath string) string {
 	if configPath == "docker" {
