@@ -3,12 +3,14 @@ package usecase
 import (
 	"context"
 	"net/http"
+	"time"
 
 	"github.com/fekuna/go-store/config"
 	"github.com/fekuna/go-store/internal/auth"
 	"github.com/fekuna/go-store/internal/models"
 	"github.com/fekuna/go-store/pkg/httpErrors"
 	"github.com/fekuna/go-store/pkg/logger"
+	"github.com/fekuna/go-store/pkg/utils"
 	"github.com/pkg/errors"
 )
 
@@ -47,7 +49,23 @@ func (u *authUC) Register(ctx context.Context, user *models.User) (*models.UserW
 
 	createdUser.SanitizePassword()
 
+	accessToken, err := utils.GenerateJWTToken(createdUser, u.cfg, time.Minute*30)
+	if err != nil {
+		return nil, httpErrors.NewInternalServerError(errors.Wrap(err, "authUC.Register.AccessToken.GenerateJWTTOken"))
+	}
+
+	refreshToken, err := utils.GenerateJWTToken(createdUser, u.cfg, (time.Hour*24)*30)
+	if err != nil {
+		return nil, httpErrors.NewInternalServerError(errors.Wrap(err, "authUC.Register.AccessToken.GenerateJWTTOken"))
+	}
+
+	authToken := models.AuthToken{
+		AccesToken:   accessToken,
+		RefreshToken: refreshToken,
+	}
+
 	return &models.UserWithToken{
-		User: createdUser,
+		User:  createdUser,
+		Token: authToken,
 	}, nil
 }

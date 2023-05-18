@@ -9,18 +9,22 @@ import (
 	authHttp "github.com/fekuna/go-store/internal/auth/delivery/http"
 	authRepository "github.com/fekuna/go-store/internal/auth/repository"
 	authUC "github.com/fekuna/go-store/internal/auth/usecase"
+	sessRepository "github.com/fekuna/go-store/internal/session/repository"
+	sessUC "github.com/fekuna/go-store/internal/session/usecase"
 	apiMiddlewares "github.com/fekuna/go-store/pkg/middleware"
 )
 
 func (s *Server) MapHandlers(e *echo.Echo) error {
 	// Init Repository
 	authRepo := authRepository.NewAuthRepository(s.db)
+	sessRepo := sessRepository.NewSessionRepository(s.db)
 
 	// Init useCase
 	authUC := authUC.NewAuthUseCase(s.cfg, s.logger, authRepo)
+	sessUC := sessUC.NewSessionUseCase(s.cfg, s.logger, sessRepo)
 
 	// Init handlers
-	authHandlers := authHttp.NewAuthHandlers(s.cfg, s.logger, authUC)
+	authHandlers := authHttp.NewAuthHandlers(s.cfg, s.logger, authUC, sessUC)
 
 	mw := apiMiddlewares.NewMiddlewareManager(s.cfg, s.logger)
 
