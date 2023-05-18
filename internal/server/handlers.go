@@ -9,9 +9,9 @@ import (
 	authHttp "github.com/fekuna/go-store/internal/auth/delivery/http"
 	authRepository "github.com/fekuna/go-store/internal/auth/repository"
 	authUC "github.com/fekuna/go-store/internal/auth/usecase"
+	apiMiddlewares "github.com/fekuna/go-store/internal/middleware"
 	sessRepository "github.com/fekuna/go-store/internal/session/repository"
 	sessUC "github.com/fekuna/go-store/internal/session/usecase"
-	apiMiddlewares "github.com/fekuna/go-store/pkg/middleware"
 )
 
 func (s *Server) MapHandlers(e *echo.Echo) error {
@@ -26,7 +26,7 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 	// Init handlers
 	authHandlers := authHttp.NewAuthHandlers(s.cfg, s.logger, authUC, sessUC)
 
-	mw := apiMiddlewares.NewMiddlewareManager(s.cfg, s.logger)
+	mw := apiMiddlewares.NewMiddlewareManager(s.cfg, s.logger, sessUC, authUC)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},

@@ -127,3 +127,15 @@ func (h *authHandlers) Login() echo.HandlerFunc {
 		// sess, err := h.sessUC.
 	}
 }
+
+func (h *authHandlers) GetMe() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		// TODO: tracing
+		user, ok := c.Get("user").(*models.User)
+		if !ok {
+			utils.LogResponseError(c, h.logger, httpErrors.NewUnauthorizedError(httpErrors.Unauthorized))
+			return utils.ErrResponseWithLog(c, h.logger, httpErrors.NewUnauthorizedError(httpErrors.Unauthorized))
+		}
+		return c.JSON(http.StatusOK, user)
+	}
+}
