@@ -2,6 +2,8 @@ package repository
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 
 	"github.com/fekuna/go-store/internal/models"
 	"github.com/fekuna/go-store/internal/session"
@@ -29,6 +31,28 @@ func (r *sessionRepo) CreateSession(ctx context.Context, sess *models.Session) (
 		ctx, createSession, &sess.RefreshToken, &sess.ExpiresAt, &sess.UserID,
 	).StructScan(s); err != nil {
 		return nil, errors.Wrap(err, "sessionRepo.CreateSession.StructScan")
+	}
+
+	return s, nil
+}
+
+func (r *sessionRepo) UpdateSessionByUserId(ctx context.Context, sess *models.Session) (*models.Session, error) {
+	// TODO: tracing
+
+	s := &models.Session{}
+	marshaled, _ := json.Marshal(sess)
+	fmt.Println(string(marshaled))
+	if err := r.db.QueryRowxContext(ctx, updateSession, &sess.UserID, &sess.RefreshToken, &sess.ExpiresAt).StructScan(s); err != nil {
+		return nil, errors.Wrap(err, "sessionRepo.UpdateSession.StructScan")
+	}
+
+	return s, nil
+}
+
+func (r *sessionRepo) FindSessionByUserId(ctx context.Context, sess *models.Session) (*models.Session, error) {
+	s := &models.Session{}
+	if err := r.db.QueryRowxContext(ctx, findSessionByUserId, &sess.UserID).StructScan(s); err != nil {
+		return nil, errors.Wrap(err, "sessionRepo.FindSessionByUserId.StructScan")
 	}
 
 	return s, nil

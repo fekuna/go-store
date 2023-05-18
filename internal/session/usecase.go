@@ -8,4 +8,5 @@ import (
 
 type UseCase interface {
 	CreateSession(ctx context.Context, session *models.Session) (*models.Session, error)
+	UpsertSession(ctx context.Context, session *models.Session) (*models.Session, error)
 }

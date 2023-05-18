@@ -97,6 +97,15 @@ func NewInternalServerError(causes interface{}) RestErr {
 	return result
 }
 
+// New Unauthorized Error
+func NewUnauthorizedError(causes interface{}) RestErr {
+	return RestError{
+		ErrStatus: http.StatusUnauthorized,
+		ErrError:  Unauthorized.Error(),
+		ErrCauses: causes,
+	}
+}
+
 // Parser of error string messages returns RestError
 func ParseError(err error) RestErr {
 	switch {

@@ -51,6 +51,15 @@ func (u *User) HashPassword() error {
 	return nil
 }
 
+// Compare user password and payload
+func (u *User) ComparePassword(password string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Prepare user for register
 func (u *User) PrepareCreate() error {
 	u.Email = strings.ToLower(strings.TrimSpace(u.Email))

@@ -74,3 +74,56 @@ func (h *authHandlers) Register() echo.HandlerFunc {
 		return c.JSON(http.StatusCreated, createdUser)
 	}
 }
+
+// Login godoc
+// @Summary Login user
+// @Description login user, returns tokens and set session in DB
+// @Tags Auth
+// @Accept json
+// @Produce json
+// @Success 200 {object} models.User
+// @Router /auth/login [post]
+func (h *authHandlers) Login() echo.HandlerFunc {
+	type Login struct {
+		Email    string `json:"email" db:"email" validate:"omitempty,lte=60"`
+		Password string `json:"password,omitempty" db:"password" validate:"required,gte=6"`
+	}
+	return func(c echo.Context) error {
+		// TODO: tracing
+		ctx := context.Background()
+
+		login := &Login{}
+		if err := utils.ReadRequest(c, login); err != nil {
+			utils.LogResponseError(c, h.logger, err)
+			return c.JSON(httpErrors.ErrorResponse(err))
+		}
+
+		userWithToken, err := h.authUC.Login(ctx, &models.User{
+			Email:    login.Email,
+			Password: login.Password,
+		})
+		if err != nil {
+			utils.LogResponseError(c, h.logger, err)
+			return c.JSON(httpErrors.ErrorResponse(err))
+		}
+
+		sess := &models.Session{
+			RefreshToken: userWithToken.Token.RefreshToken,
+			ExpiresAt:    time.Now().Add(time.Hour * 24 * 30),
+			UserID:       userWithToken.User.UserID,
+		}
+
+		// TODO: can generate multiple session for multiple devices. for the future feature.
+		_, err = h.sessUC.UpsertSession(ctx, sess)
+		if err != nil {
+			utils.LogResponseError(c, h.logger, err)
+			return c.JSON(httpErrors.ErrorResponse(err))
+		}
+
+		// fmt.Println(upserted)
+
+		return c.JSON(http.StatusOK, userWithToken)
+
+		// sess, err := h.sessUC.
+	}
+}
