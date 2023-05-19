@@ -16,6 +16,33 @@ services:
     networks:
       - web_api
 
+  minio:
+    image: minio/minio:latest
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    container_name: myminio
+    environment:
+      - MINIO_ACCESS_KEY=minio
+      - MINIO_SECRET_KEY=minio123
+    command: server /data --console-address :9001
+    networks:
+      - web_api
+    
+  mc:
+    image: minio/mc:latest
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+        /usr/bin/mc config host rm local;
+        /usr/bin/mc config host add --api s3v4 s3 http://myminio:9000 minio minio123;
+        /usr/bin/mc mb s3/static/;
+        /usr/bin/mc anonymous set download s3/static;
+      "
+    networks:
+      - web_api
+
 networks:
   web_api:
     driver: bridge
