@@ -149,7 +149,7 @@ func (u *authUC) UploadAvatar(ctx context.Context, userID uuid.UUID, file models
 }
 
 func (u *authUC) GetAvatar(ctx context.Context) (*url.URL, error) {
-	return u.minioRepo.GetObjectUrl(ctx, "static", "pathnich/44733af6-649e-4489-8092-b00c5d782f97-camera_lense_0.jpeg", time.Hour*24*7)
+	return u.minioRepo.GetObjectUrl(ctx, "static", "static/pathnich/6b2dba16-c2eb-4cce-89c1-7d2b4c5368fa-camera_lense_0.jpeg", time.Hour*24*7)
 }
 
 func (u *authUC) generateMinioURL(bucket string, key string) string {

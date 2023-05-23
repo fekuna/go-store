@@ -27,7 +27,7 @@ main
 pgdata
 vendor
 tmp
-./local
+.local
 
 # Avatars storage directory
 avatars/

@@ -26,12 +26,12 @@ func NewAuthMinioRepository(minioClient *minio.Client) auth.MinioRepository {
 // Upload file to Minio
 func (r *authMinioRepository) PutObject(ctx context.Context, input models.UploadInput) (*minio.UploadInfo, error) {
 	// TODO: Tracing
-	options := minio.PutObjectOptions{
-		ContentType:  input.ContentType,
-		UserMetadata: map[string]string{"x-amz-acl": "public-read"},
-	}
+	// options := minio.PutObjectOptions{
+	// 	ContentType:  input.ContentType,
+	// 	UserMetadata: map[string]string{"x-amz-acl": "public-read"},
+	// }
 
-	uploadInfo, err := r.client.PutObject(ctx, input.BucketName, r.generateFileName(input.Name), input.File, input.Size, options)
+	uploadInfo, err := r.client.PutObject(ctx, input.BucketName, r.generateFileName(input.Name), input.File, input.Size, minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		fmt.Println("Mashok", err)
 		return nil, errors.Wrap(err, "authAWSRepository.FileUpload.PutObject")

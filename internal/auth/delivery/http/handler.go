@@ -232,6 +232,6 @@ func (h *authHandlers) GetAvatar() echo.HandlerFunc {
 			c.JSON(http.StatusBadRequest, err.Error())
 		}
 
-		return c.JSON(http.StatusOK, url)
+		return c.JSON(http.StatusOK, url.String())
 	}
 }
