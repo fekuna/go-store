@@ -128,6 +128,7 @@ func (u *authUC) UploadAvatar(ctx context.Context, userID uuid.UUID, file models
 
 	uploadInfo, err := u.minioRepo.PutObject(ctx, file)
 	if err != nil {
+		u.logger.Errorf("AuthUC.Update.UploadAvatar: %s", err)
 		return nil, httpErrors.NewInternalServerError(errors.Wrap(err, "authUC.UploadAvatar.PutObject"))
 	}
 
