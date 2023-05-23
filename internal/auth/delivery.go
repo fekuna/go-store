@@ -8,4 +8,5 @@ type Handlers interface {
 	Login() echo.HandlerFunc
 	GetMe() echo.HandlerFunc
 	UploadAvatar() echo.HandlerFunc
+	GetAvatar() echo.HandlerFunc
 }

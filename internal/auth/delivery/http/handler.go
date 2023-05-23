@@ -3,6 +3,7 @@ package http
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -203,5 +204,34 @@ func (h *authHandlers) UploadAvatar() echo.HandlerFunc {
 		}
 
 		return c.JSON(http.StatusOK, updatedUser)
+	}
+}
+
+// GetAvatar godoc
+// @Summary Post avatar
+// @Description Post user avatar image
+// @Tags Auth
+// @Accept  json
+// @Produce  json
+// @Param file formData file true "Body with image file"
+// @Param bucket query string true "aws s3 bucket" Format(bucket)
+// @Param id path int true "user_id"
+// @Success 200 {string} string	"ok"
+// @Failure 500 {object} httpErrors.RestError
+// @Router /auth/{id}/avatar [post]
+func (h *authHandlers) GetAvatar() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		fmt.Println("Hello GetAvatar")
+		// TODO: tracing
+
+		ctx := context.Background()
+
+		url, err := h.authUC.GetAvatar(ctx)
+		fmt.Printf("ini URL %+v\n", url)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, err.Error())
+		}
+
+		return c.JSON(http.StatusOK, url)
 	}
 }

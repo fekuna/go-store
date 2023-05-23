@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"time"
 
 	"github.com/fekuna/go-store/internal/auth"
 	"github.com/fekuna/go-store/internal/models"
@@ -60,7 +62,22 @@ func (r *authMinioRepository) RemoveObject(ctx context.Context, bucket string, f
 	return nil
 }
 
+// GetUrl of object from Minio
+func (r *authMinioRepository) GetObjectUrl(ctx context.Context, bucket string, fileName string, expires time.Duration) (*url.URL, error) {
+	if expires == 0 {
+		expires = time.Second * 604800
+	}
+	// reqParams.Set("response-content-disposition", "attachment; filename=\"your-filename.txt\"")
+
+	objectUrl, err := r.client.PresignedGetObject(ctx, bucket, fileName, expires, url.Values{})
+	if err != nil {
+		return nil, err
+	}
+
+	return objectUrl, nil
+}
+
 func (r *authMinioRepository) generateFileName(fileName string) string {
 	uid := uuid.New().String()
-	return fmt.Sprintf("%s-%s", uid, fileName)
+	return fmt.Sprintf("pathnich/%s-%s", uid, fileName)
 }

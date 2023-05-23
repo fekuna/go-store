@@ -3,6 +3,8 @@ package auth
 
 import (
 	"context"
+	"net/url"
+	"time"
 
 	"github.com/fekuna/go-store/internal/models"
 	"github.com/minio/minio-go/v7"
@@ -13,4 +15,5 @@ type MinioRepository interface {
 	PutObject(ctx context.Context, input models.UploadInput) (*minio.UploadInfo, error)
 	GetObject(ctx context.Context, bucket string, fileName string) (*minio.Object, error)
 	RemoveObject(ctx context.Context, bucket string, fileName string) error
+	GetObjectUrl(ctx context.Context, bucket string, fileName string, expires time.Duration) (*url.URL, error)
 }
