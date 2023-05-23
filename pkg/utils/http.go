@@ -1,9 +1,13 @@
 package utils
 
 import (
+	"mime/multipart"
+	"net/http"
+
 	"github.com/fekuna/go-store/pkg/httpErrors"
 	"github.com/fekuna/go-store/pkg/logger"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
 )
 
 // UserCtxKey is a key used for the User object in the context
@@ -56,4 +60,41 @@ func LogResponseError(ctx echo.Context, logger logger.Logger, err error) {
 		GetIPAddress(ctx),
 		err,
 	)
+}
+
+func ReadImage(ctx echo.Context, field string) (*multipart.FileHeader, error) {
+	image, err := ctx.FormFile(field)
+	if err != nil {
+		return nil, errors.WithMessage(err, "ctx.FormFile")
+	}
+
+	// Check content type of image
+	if err = CheckImageContentType(image); err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
+var allowedImagesContentTypes = map[string]string{
+	"image/bmp":                "bmp",
+	"image/gif":                "gif",
+	"image/png":                "png",
+	"image/jpeg":               "jpeg",
+	"image/jpg":                "jpg",
+	"image/svg+xml":            "svg",
+	"image/webp":               "webp",
+	"image/tiff":               "tiff",
+	"image/vnd.microsoft.icon": "ico",
+}
+
+func CheckImageFileContentType(fileContent []byte) (string, error) {
+	contentType := http.DetectContentType(fileContent)
+
+	extension, ok := allowedImagesContentTypes[contentType]
+	if !ok {
+		return "", errors.New("this content type is not allowed")
+	}
+
+	return extension, nil
 }

@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -17,17 +18,19 @@ import (
 
 // Auth Usecase
 type authUC struct {
-	cfg      *config.Config
-	logger   logger.Logger
-	authRepo auth.Repository
+	cfg       *config.Config
+	logger    logger.Logger
+	authRepo  auth.Repository
+	minioRepo auth.MinioRepository
 }
 
 // Auth usecase constructor
-func NewAuthUseCase(cfg *config.Config, logger logger.Logger, authRepo auth.Repository) auth.UseCase {
+func NewAuthUseCase(cfg *config.Config, logger logger.Logger, authRepo auth.Repository, minioRepo auth.MinioRepository) auth.UseCase {
 	return &authUC{
-		cfg:      cfg,
-		logger:   logger,
-		authRepo: authRepo,
+		cfg:       cfg,
+		logger:    logger,
+		authRepo:  authRepo,
+		minioRepo: minioRepo,
 	}
 }
 
@@ -117,4 +120,32 @@ func (u *authUC) GetByID(ctx context.Context, userID uuid.UUID) (*models.User, e
 	user.SanitizePassword()
 
 	return user, nil
+}
+
+// Upload user avatar
+func (u *authUC) UploadAvatar(ctx context.Context, userID uuid.UUID, file models.UploadInput) (*models.User, error) {
+	// TODO: Tracing
+
+	uploadInfo, err := u.minioRepo.PutObject(ctx, file)
+	if err != nil {
+		return nil, httpErrors.NewInternalServerError(errors.Wrap(err, "authUC.UploadAvatar.PutObject"))
+	}
+
+	avatarURL := u.generateMinioURL(file.BucketName, uploadInfo.Key)
+
+	updatedUser, err := u.authRepo.Update(ctx, &models.User{
+		UserID: userID,
+		Avatar: &avatarURL,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	updatedUser.SanitizePassword()
+
+	return updatedUser, nil
+}
+
+func (u *authUC) generateMinioURL(bucket string, key string) string {
+	return fmt.Sprintf("%s/%s/%s", u.cfg.Minio.Endpoint, bucket, key)
 }

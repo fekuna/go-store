@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	"github.com/fekuna/go-store/config"
 	"github.com/fekuna/go-store/internal/models"
@@ -42,10 +41,8 @@ func (s *SessionUC) UpsertSession(ctx context.Context, session *models.Session) 
 
 	// If No Data found. we insert it
 	if errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("Create session")
 		return s.sessionRepo.CreateSession(ctx, session)
 	} else {
-		fmt.Println("Update session")
 		// update session if user has session
 		return s.sessionRepo.UpdateSessionByUserId(ctx, session)
 	}

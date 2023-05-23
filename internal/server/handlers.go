@@ -18,9 +18,10 @@ func (s *Server) MapHandlers(e *echo.Echo) error {
 	// Init Repository
 	authRepo := authRepository.NewAuthRepository(s.db)
 	sessRepo := sessRepository.NewSessionRepository(s.db)
+	authMinioRepo := authRepository.NewAuthMinioRepository(s.minioClient)
 
 	// Init useCase
-	authUC := authUC.NewAuthUseCase(s.cfg, s.logger, authRepo)
+	authUC := authUC.NewAuthUseCase(s.cfg, s.logger, authRepo, authMinioRepo)
 	sessUC := sessUC.NewSessionUseCase(s.cfg, s.logger, sessRepo)
 
 	// Init handlers

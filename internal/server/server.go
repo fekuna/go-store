@@ -13,6 +13,7 @@ import (
 	"github.com/fekuna/go-store/pkg/logger"
 	"github.com/jmoiron/sqlx"
 	"github.com/labstack/echo/v4"
+	"github.com/minio/minio-go/v7"
 )
 
 const (
@@ -22,19 +23,21 @@ const (
 
 // Server struct
 type Server struct {
-	echo   *echo.Echo
-	cfg    *config.Config
-	logger logger.Logger
-	db     *sqlx.DB
+	echo        *echo.Echo
+	cfg         *config.Config
+	logger      logger.Logger
+	db          *sqlx.DB
+	minioClient *minio.Client
 }
 
 // NewServer New Server constructor
-func NewServer(cfg *config.Config, logger logger.Logger, db *sqlx.DB) *Server {
+func NewServer(cfg *config.Config, logger logger.Logger, db *sqlx.DB, minioClient *minio.Client) *Server {
 	return &Server{
-		echo:   echo.New(),
-		cfg:    cfg,
-		logger: logger,
-		db:     db,
+		echo:        echo.New(),
+		cfg:         cfg,
+		logger:      logger,
+		db:          db,
+		minioClient: minioClient,
 	}
 }
 

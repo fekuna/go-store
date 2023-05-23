@@ -6,6 +6,7 @@ import (
 
 	"github.com/fekuna/go-store/config"
 	"github.com/fekuna/go-store/internal/server"
+	"github.com/fekuna/go-store/pkg/db/minioS3"
 	"github.com/fekuna/go-store/pkg/db/postgres"
 	"github.com/fekuna/go-store/pkg/logger"
 	"github.com/fekuna/go-store/pkg/utils"
@@ -47,7 +48,9 @@ func main() {
 	}
 	defer psqlDB.Close()
 
-	s := server.NewServer(cfg, appLogger, psqlDB)
+	minioClient, err := minioS3.NewMinioS3Client(cfg.Minio.Endpoint, cfg.Minio.MinioAccessKey, cfg.Minio.MinioSecretKey, cfg.Minio.UseSSL)
+
+	s := server.NewServer(cfg, appLogger, psqlDB, minioClient)
 	if err = s.Run(); err != nil {
 		log.Fatal(err)
 	}

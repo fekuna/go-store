@@ -84,7 +84,7 @@ func (l *apiLogger) InitLogger() {
 
 	encoderCfg.EncodeTime = zapcore.ISO8601TimeEncoder
 	core := zapcore.NewCore(encoder, logWriter, zap.NewAtomicLevelAt(logLevel))
-	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1))
+	logger := zap.New(core, zap.AddCaller(), zap.AddCallerSkip(2))
 
 	l.sugarLogger = logger.Sugar()
 	if err := l.sugarLogger.Sync(); err != nil {

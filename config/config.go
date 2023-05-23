@@ -13,6 +13,7 @@ type Config struct {
 	Server   ServerConfig
 	Logger   LoggerConfig
 	Postgres PostgresConfig
+	Minio    MinioConfig
 }
 
 type ServerConfig struct {
@@ -45,6 +46,15 @@ type PostgresConfig struct {
 	PostgresqlDbName   string
 	PostgresqlSslMode  bool
 	PgDriver           string
+}
+
+// Minio S3
+type MinioConfig struct {
+	Endpoint       string
+	MinioAccessKey string
+	MinioSecretKey string
+	UseSSL         bool
+	MinioEndpoint  string
 }
 
 // Load config file from given path
